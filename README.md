@@ -43,5 +43,6 @@ $ git clone https://github.com/wizeservices/vagrant-trusty-lemp [name-of-my-lemp
   the Puppet modules.
   * Your password will be required to alter your hosts file.
   * You can test your installation by creating an **index.php** inside the **www/** folder, then browsing `http://[PROJECT_NAME].local`.
+* You can connect to your VM via SSH with `vagrant ssh`.
 * You can restart the VM with `vagrant reload` or stop it with `vagrant halt`.
 * If you're not gonna need the VM anymore and want to free the resources you can use `vagrant destroy`.
