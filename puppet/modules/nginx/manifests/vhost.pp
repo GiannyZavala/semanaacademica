@@ -1,9 +1,9 @@
 define nginx::vhost(
   $name,
   $aliases = [],
-  $port    = '80',
+  $port = '80',
   $wwwroot,
-  $index   = 'index.html index.htm index.php',
+  $index = 'index.html index.htm index.php',
   $enabled = true,
 ) {
   include nginx

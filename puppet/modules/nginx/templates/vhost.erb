@@ -35,11 +35,21 @@ server {
         }
     }
 
+    location = /robots.txt  {
+        access_log off;
+        log_not_found off;
+    }
+
+    location = /favicon.ico {
+        access_log off;
+        log_not_found off;
+    }
+
     location ~/\.ht {
         deny all;
     }
 
-    location ~/Vagrantfile(\.sample)? {
+    location ~/Vagrantfile {
         deny all;
     }
 
