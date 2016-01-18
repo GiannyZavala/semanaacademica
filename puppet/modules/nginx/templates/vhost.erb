@@ -12,32 +12,111 @@ server {
     root        <%= @wwwroot %>;
 
     location / {
-        try_files $uri $uri/ /index.php;
-
         index <%= @index %>;
-        location ~ \.php$ {
-            fastcgi_pass 127.0.0.1:9000;
-            fastcgi_index index.php;
-            fastcgi_param SCRIPT_FILENAME <%= @wwwroot %>$fastcgi_script_name;
-            fastcgi_param PATH_INFO $fastcgi_script_name;
-            fastcgi_param PHP_VALUE "allow_url_fopen=on";
-
-            include /etc/nginx/fastcgi_params;
-        }
-
-        if (-f $request_filename) {
-            expires 30d;
-            break;
-        }
-
-        if (!-e $request_filename) {
-            rewrite ^(.+)$ /index.php?q=$1 last;
-        }
+        try_files $uri $uri/ /index.php?$args;
     }
 
-    location = /robots.txt  {
-        access_log off;
+    #############
+    # Specify a charset
+    ############
+        charset                         utf-8;
+
+    ############
+    # GZIP
+    ###########
+        gzip                            off;
+
+    #############
+    # Add trailing slash to */wp-admin requests.
+    ############
+        rewrite /wp-admin$ $scheme://$host$uri/ permanent;
+
+    ############
+    # this prevents hidden files (beginning with a period) from being served
+    ############
+
+    location ~ /\. {
+        access_log                      off;
+        log_not_found                   off;
+        deny                            all;
+    }
+
+    ###########
+    # SEND EXPIRES HEADERS AND TURN OFF 404 LOGGING
+    ###########
+    location ~* ^.+.(xml|ogg|ogv|svg|svgz|eot|otf|woff|mp4|ttf|css|rss|atom|js|jpg|jpeg|gif|png|ico|zip|tgz|gz|rar|bz2|doc|xls|exe|ppt|tar|mid|midi|wav|bmp|rtf)$ {
+        access_log                      off;
+        log_not_found                   off;
+        expires                         max;
+    }
+
+    ############
+    # Pass uploaded files to wp-includes/ms-files.php.
+    ############
+
+    #       rewrite                         /files/$ /index.php last;
+
+    if ($uri !~ wp-content/plugins) {
+            rewrite /files/(.+)$ /wp-includes/ms-files.php?file=$1 last;
+    }
+
+    # Rewrite multisite in a subdirectory '.../wp-.*' and '.../*.php'.
+    if (!-e $request_filename) {
+        rewrite ^/[_0-9a-zA-Z-]+(/wp-.*) $1 last;
+        rewrite ^/[_0-9a-zA-Z-]+.*(/wp-admin/.*\.php)$ $1 last;
+        rewrite ^/[_0-9a-zA-Z-]+(/.*\.php)$ $1 last;
+    }
+
+    # Rewrite multisite '.../wp-.*' and '.../*.php'.
+    if (!-e $request_filename) {
+        rewrite /wp-admin$ $scheme://$host$uri/ permanent;
+        rewrite ^/[_0-9a-zA-Z-]+(/wp-.*) /wp$1 last;
+        rewrite ^/[_0-9a-zA-Z-]+(/.*\.php)$ /wp$1 last;
+    }
+
+
+    ############
+    # Pass all .php files onto a php-fpm or php-cgi server
+    ############
+
+    location ~ \.php$ {
+
+        # Try the files specified in order. In our case, try the requested URI and if
+        # that fails, try (successfully) to pass a 404 error.
+        # zero day exploit defense
+
+        try_files                       $uri =404;
+
+        fastcgi_pass 127.0.0.1:9000;
+        fastcgi_index index.php;
+        fastcgi_param SCRIPT_FILENAME <%= @wwwroot %>$fastcgi_script_name;
+        fastcgi_param PATH_INFO $fastcgi_script_name;
+        fastcgi_param PHP_VALUE "allow_url_fopen=on";
+
+        include /etc/nginx/fastcgi_params;
+    }
+
+
+    ############
+    # ROBOTS
+    ###########
+
+    location = /robots.txt {
+        allow all;
         log_not_found off;
+        access_log off;
+    }
+
+
+    ############
+    # RESTRICTIONS
+    ############
+
+    # Deny access to any files with a .php extension in the uploads directory
+    # Works in sub-directory installs and also in multisite network
+    # Keep logging the requests to parse later (or to pass to firewall utilities such as fail2ban)
+    location ~* /(?:uploads|files)/.*\.php$ {
+        deny all;
     }
 
     location = /favicon.ico {
@@ -56,4 +135,5 @@ server {
     location /puppet/ {
         deny all;
     }
+
 }
