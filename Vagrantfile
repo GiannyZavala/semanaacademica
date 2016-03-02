@@ -1,5 +1,6 @@
 VAGRANTFILE_API_VERSION = "2"
 PROJECT_NAME = 'damdiram'
+DEST_FOLDER = '/var/www/app'
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
@@ -15,7 +16,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     vb.customize ['modifyvm', :id, '--memory', '1024']
   end
 
-  config.vm.synced_folder 'www', '/www'
+  config.vm.synced_folder 'www', DEST_FOLDER
   config.vm.provision 'shell', inline: 'test -d /etc/puppet/modules/apt || puppet module install puppetlabs/apt'
   config.vm.provision 'puppet' do |puppet|
     puppet.manifests_path = 'puppet/manifests'
@@ -24,7 +25,15 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     puppet.options        = '--verbose --debug'
     puppet.facter         = {
       'mysql_root_password'  => 'vagrant',
-      'wwwroot'              => '/www'
+      'wwwroot'              => DEST_FOLDER,
+      'db_username'          => 'username',
+      'db_password'          => 'password',
+      'db_name'              => 'database_name',
+      'wp_url'               => "#{config.vm.hostname}.local",
+      'wp_title'             => PROJECT_NAME,
+      'wp_user'              => 'username',
+      'wp_password'          => 'password',
+      'wp_email'             => 'email@example.com'
     }
   end
 
