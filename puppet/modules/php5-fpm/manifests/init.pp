@@ -16,6 +16,12 @@ class php5-fpm {
     require => Apt::Ppa['ppa:ondrej/php5-5.6'],
   }
 
+  exec { 'deleting-bad-characters':
+    command => "/bin/sed -i '/author/d' /etc/init/php5-fpm.conf",
+    before => Service['php5-fpm'],
+    require => Package['php5-fpm', 'php5-cli'],
+  }
+
   service { 'php5-fpm':
     ensure     => running,
     enable     => true,
