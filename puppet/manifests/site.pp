@@ -1,3 +1,8 @@
+exec { 'update-packages':
+  command => "/usr/bin/apt-get update -y",
+  before => Exec["create-app-root"],
+}
+
 exec { 'create-app-root':
   command => "/bin/mkdir -p $::wwwroot",
   before => Class['nginx', 'mariadb::install', 'php5-fpm', 'phpmyadmin', 'git::install'],
