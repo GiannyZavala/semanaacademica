@@ -9,12 +9,14 @@ class wp-cli {
   file { '/usr/bin/wp':
     ensure => 'link',
     target => '/usr/share/wp-cli/bin/wp',
+    require => Exec['composer-wp-cli'],
   }
 
   exec { 'wp-cli-fix-permissions':
     command => "chmod a+x /usr/share/wp-cli/bin/wp",
     path => '/usr/bin:/bin:/usr/sbin:/sbin',
     user => 'root',
+    require => Exec['composer-wp-cli'],
   }
 
 }

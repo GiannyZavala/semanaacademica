@@ -1,10 +1,29 @@
+exec { 'update-packages':
+  command => "/usr/bin/apt-get update -y",
+  before => Exec["create-app-root"],
+}
+
+exec { 'create-app-root':
+  command => "/bin/mkdir -p $::wwwroot",
+  before => Class['nginx', 'mariadb::install', 'php5-fpm', 'phpmyadmin', 'git::install'],
+}
+
 class { 'nginx': }
 class { 'mariadb::install': }
 class { 'php5-fpm': }
-class { 'phpmyadmin': }
+class { 'phpmyadmin':
+  require => Class['mariadb::install'],
+}
 class { 'git::install': }
 class { 'composer':
   command_name => 'composer',
-  target_dir   => '/usr/local/bin'
+  target_dir   => '/usr/local/bin',
+  require => Class['php5-fpm'],
 }
-class { 'wp-cli': }
+class { 'wp-cli':
+  require => Class['composer'],
+}
+
+class { 'postbuild':
+  require => Class['mariadb::install', 'wp-cli']
+}
