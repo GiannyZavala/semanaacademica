@@ -34,7 +34,7 @@ class php5-fpm {
     owner   => root,
     group   => root,
     mode    => '0644',
-    source  => 'puppet:///modules/php5-fpm/www.conf',
+    content  => template('php5-fpm/www.conf.erb'),
     notify  => Service['php5-fpm'],
     require => Package['php5-fpm'],
   }

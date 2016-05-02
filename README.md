@@ -51,17 +51,17 @@ the configuration won't be updated.
 
 ## Puppet apply
 1. Login as root user:
-```
+  ```
 sudo su
-```
+  ```
 
 2. Install the puppet module for apt:
-```
+  ```
 puppet module install puppetlabs/apt --target-dir ./puppet/modules
-```
+  ```
 
 3. Create a file at /etc/facter/facts.d/custom.txt (**Note:** the wp_url must be in your /etc/hosts to be able to reach by domain name):
-```
+  ```
 mysql_root_password=vagrant
 wwwroot=/var/www/app
 db_username=username
@@ -72,9 +72,11 @@ wp_title=title
 wp_user=username
 wp_password=password
 wp_email=example@example.com
-```
+username=username
+group=group
+  ```
 
 4. Run the following command:
-```
+  ```
 puppet apply --debug --verbose puppet/manifests/site.pp --modulepath puppet/modules
-```
+  ```

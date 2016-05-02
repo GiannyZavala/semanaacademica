@@ -15,7 +15,7 @@ class nginx {
     owner   => root,
     group   => root,
     mode    => '0644',
-    source  => 'puppet:///modules/nginx/nginx.conf',
+    content  => template('nginx/nginx.conf.erb'),
     require => Package['nginx'],
     notify  => Service['nginx'],
   }
@@ -27,8 +27,8 @@ class nginx {
 
   exec { 'add-vagrant-to-www-data':
     path    => '/bin:/usr/bin:/usr/sbin',
-    unless  => "grep -q 'www-data\\S*vagrant' /etc/group",
-    command => 'usermod -aG www-data vagrant',
+    unless  => "grep -q 'www-data\\S*$::username' /etc/group",
+    command => "usermod -aG www-data $::username",
   }
 
   vhost { $hostname:

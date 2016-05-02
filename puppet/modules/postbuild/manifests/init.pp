@@ -14,8 +14,8 @@ FLUSH PRIVILEGES;
 "
   exec { 'mysql-configuration':
     path   => "/usr/bin:/usr/sbin:/bin",
-    command => "mysql -u root -pvagrant -e \"$content\"",
-    unless => "/usr/bin/mysql -u root -pvagrant -e 'show databases' | grep $::db_name",
+    command => "mysql -u root -p$::mysql_root_password -e \"$content\"",
+    unless => "/usr/bin/mysql -u root -p$::mysql_root_password -e 'show databases' | grep $::db_name",
   }
 
   exec { 'wp-configuration':
