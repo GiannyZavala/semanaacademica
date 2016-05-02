@@ -11,7 +11,7 @@ class php5-fpm {
     require => Apt::Key['ppa:ondrej/php5-5.6'],
   }
 
-  package { ['php5-fpm', 'php5-cli']:
+  package { ['php5-fpm', 'php5-cli', 'php5-curl']:
     ensure  => installed,
     require => Apt::Ppa['ppa:ondrej/php5-5.6'],
   }
