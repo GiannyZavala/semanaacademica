@@ -33,7 +33,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       'wp_title'             => PROJECT_NAME,
       'wp_user'              => 'username',
       'wp_password'          => 'password',
-      'wp_email'             => 'email@example.com'
+      'wp_email'             => 'email@example.com',
+      'username'             => 'vagrant',
+      'group'                => 'www-data',
     }
   end
 
