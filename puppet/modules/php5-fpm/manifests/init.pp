@@ -1,19 +1,19 @@
 class php5-fpm {
   include apt
 
-  apt::key { 'ppa:ondrej/php5-5.6':
+  apt::key { 'ppa:ondrej/php':
     ensure => present,
     server => 'hkp://keyserver.ubuntu.com:80',
-    id     => 'E5267A6C',
+    id     => '14AA40EC0831756756D7F66C4F4EA0AAE5267A6C',
   }
 
-  apt::ppa { 'ppa:ondrej/php5-5.6':
-    require => Apt::Key['ppa:ondrej/php5-5.6'],
+  apt::ppa { 'ppa:ondrej/php':
+    require => Apt::Key['ppa:ondrej/php'],
   }
 
   package { ['php5-fpm', 'php5-cli', 'php5-curl']:
     ensure  => installed,
-    require => Apt::Ppa['ppa:ondrej/php5-5.6'],
+    require => Apt::Ppa['ppa:ondrej/php'],
   }
 
   exec { 'deleting-bad-characters':
@@ -34,7 +34,7 @@ class php5-fpm {
     owner   => root,
     group   => root,
     mode    => '0644',
-    content  => template('php5-fpm/www.conf.erb'),
+    content => template('php5-fpm/www.conf.erb'),
     notify  => Service['php5-fpm'],
     require => Package['php5-fpm'],
   }
